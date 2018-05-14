@@ -1,0 +1,7 @@
+- Use other type of IDs for peers(?)
+
+- When closing (or during execution) store last known live peers along with a timestamp (when booting connect to these peers right away if timestamp is within a certain limit)
+
+- Implement epidemic broadcast trees to facilitate routing and maintain live peers ?
+
+- Implement our own pub/sub protocol
