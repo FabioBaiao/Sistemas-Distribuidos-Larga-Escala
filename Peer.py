@@ -19,6 +19,12 @@ class Peer:
 		
 		self.id = "{}:{}".format(self.address, self.port)
 		print("New peer at ", self.id)
+	
+	def peers_lock(self):
+		self.peersLock.lock()
+	
+	def peers_unlock(self):
+		self.peersLock.unlock()
 		
 	def add_peer(self, p_id, address, port):
 		self.peers[p_id] = (address, port)
