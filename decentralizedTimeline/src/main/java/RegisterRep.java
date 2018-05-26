@@ -29,6 +29,7 @@ public class RegisterRep implements CatalystSerializable {
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
         int i = bufferInput.readInt();
         int j = 0;
+        this.livePeers = new ArrayList<>();
         while(j < i) {
             this.livePeers.add(new Address(bufferInput.readString(), bufferInput.readInt()));
             j++;
