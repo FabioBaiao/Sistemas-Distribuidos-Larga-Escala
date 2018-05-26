@@ -26,6 +26,12 @@
             <artifactId>catalyst-netty</artifactId>
             <version>1.2.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>pt.haslab</groupId>
+            <artifactId>ekit</artifactId>
+            <version>1.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 
