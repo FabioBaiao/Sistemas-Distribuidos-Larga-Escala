@@ -1,19 +1,23 @@
 import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
-import io.atomix.catalyst.serializer.CatalystSerializable;
 import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Address;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class RegisterRep implements CatalystSerializable {
-    public List<Address> livePeers;
+public class RegisterRep extends AbstractMessage {
+    private List<Address> livePeers;
 
-    public RegisterRep(){}
+    public RegisterRep() {}
 
-    public RegisterRep(List<Address> livePeers){
-        this.livePeers = livePeers;
+    public RegisterRep(List<Address> livePeers) {
+        this.livePeers = Collections.unmodifiableList(new ArrayList<>(livePeers));
+    }
+
+    public List<Address> getLivePeers() {
+        return livePeers;
     }
 
     @Override
@@ -27,12 +31,12 @@ public class RegisterRep implements CatalystSerializable {
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
-        int i = bufferInput.readInt();
-        int j = 0;
-        this.livePeers = new ArrayList<>();
-        while(j < i) {
+        final int size = bufferInput.readInt();
+
+        this.livePeers = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
             this.livePeers.add(new Address(bufferInput.readString(), bufferInput.readInt()));
-            j++;
         }
+        this.livePeers = Collections.unmodifiableList(this.livePeers);
     }
 }

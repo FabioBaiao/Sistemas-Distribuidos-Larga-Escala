@@ -47,7 +47,7 @@ public class Peer {
                 (RegisterRep) this.tc.execute(() ->
                 c.sendAndReceive(new RegisterReq(this.username))).join().get();
 
-        connectToNeigbors(regRep.livePeers);
+        connectToNeigbors(regRep.getLivePeers());
     }
 
     public void connectToNeigbors(List<Address> regRep) throws Exception{
