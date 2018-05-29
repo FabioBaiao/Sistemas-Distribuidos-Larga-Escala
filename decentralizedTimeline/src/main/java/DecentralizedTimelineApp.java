@@ -1,13 +1,8 @@
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
 
 public class DecentralizedTimelineApp implements Runnable {
     
@@ -78,7 +73,7 @@ public class DecentralizedTimelineApp implements Runnable {
         String username = in.readLine();
 
         System.out.println("Username '" + username + "' successfully read");
-        System.out.println("TODO: Register user");
+        System.out.println("TODO: registration user");
 
         return 0;
     }
