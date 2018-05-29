@@ -2,11 +2,11 @@ import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.Serializer;
 
-public class SubscriptionMessage extends AbstractMessage {
-    public SubscriptionMessage() {
+public class SubscriptionDirectedMessage extends AbstractDirectedMessage {
+    public SubscriptionDirectedMessage() {
     }
 
-    public SubscriptionMessage(String senderUsername, String destinationUsername) {
+    public SubscriptionDirectedMessage(String senderUsername, String destinationUsername) {
         super(senderUsername, destinationUsername);
     }
 
