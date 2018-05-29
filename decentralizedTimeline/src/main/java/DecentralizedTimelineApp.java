@@ -1,3 +1,6 @@
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -22,15 +25,14 @@ public class DecentralizedTimelineApp implements Runnable {
     private boolean exit;
     private final BufferedReader in;
     private final Map<String, CheckedIOFunction<String[], Integer>> cmdMap; // see CheckedIOFunction.java
-    
-    // TODO: Add peer instance variable
 
+    // TODO: Add peer instance variable
     public DecentralizedTimelineApp() {
         exit = false;
         in = new BufferedReader(new InputStreamReader(System.in));
-
         cmdMap = new HashMap<>();
         cmdMap.put("register", this::register);
+        cmdMap.put("login", this::login);
         cmdMap.put("list", this::listUsers);
         cmdMap.put("sub", this::subscribe);
         cmdMap.put("pub", this::publish);
@@ -77,6 +79,16 @@ public class DecentralizedTimelineApp implements Runnable {
 
         System.out.println("Username '" + username + "' successfully read");
         System.out.println("TODO: Register user");
+
+        return 0;
+    }
+
+    public Integer login(String[] argv) throws IOException {
+        if (argv.length != 2) {
+            System.out.println("Usage: login username");
+            return -1;
+        }
+        System.out.println("TODO: Call login on peer");
 
         return 0;
     }
