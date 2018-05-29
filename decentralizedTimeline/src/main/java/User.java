@@ -4,25 +4,22 @@ import org.mapdb.DataOutput2;
 import org.mapdb.Serializer;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class User {
     public static final User.SerializerUser SERIALIZER = new SerializerUser();
 
     private final String username;
-    private final List<UserMessage> sentMessages;
-    private final List<UserMessage> unsentMessages;
+    private final SortedSet<UserMessage> sentMessages;
+    private final SortedSet<UserMessage> unsentMessages;
     private final Set<String> subscribers;
     private final Set<String> subscribed;
 
     public User(String username) {
-        this(username, new ArrayList<>(), new ArrayList<>(), new HashSet<>(), new HashSet<>());
+        this(username, new TreeSet<>(), new TreeSet<>(), new HashSet<>(), new HashSet<>());
     }
 
-    private User(String username, List<UserMessage> sentMessages, List<UserMessage> unsentMessages,
+    private User(String username, SortedSet<UserMessage> sentMessages, SortedSet<UserMessage> unsentMessages,
                  Set<String> subscribers, Set<String> subscribed)
     {
         this.username = username;
@@ -32,8 +29,8 @@ public class User {
         this.subscribed = subscribed;
     }
 
-    public Set<UserMessage> getUnsentMessages() {
-        return new HashSet<>(unsentMessages);
+    public SortedSet<UserMessage> getUnsentMessages() {
+        return unsentMessages;
     }
 
     public void markAllAsSent() {
@@ -99,14 +96,14 @@ public class User {
 
             // sentMessages
             size = dataInput2.readInt();
-            List<UserMessage> sentMessages = new ArrayList<>(size);
+            SortedSet<UserMessage> sentMessages = new TreeSet<>();
             for (int i = 0; i < size; i++) {
                 sentMessages.add(UserMessage.SERIALIZER.deserialize(dataInput2, -1)); // TODO: Check if this works
             }
 
             // unsentMessages
             size = dataInput2.readInt();
-            List<UserMessage> unsentMessages = new ArrayList<>(size);
+            SortedSet<UserMessage> unsentMessages = new TreeSet<>();
             for (int i = 0; i < size; i++) {
                 unsentMessages.add(UserMessage.SERIALIZER.deserialize(dataInput2, -1));
             }
