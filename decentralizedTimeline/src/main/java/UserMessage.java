@@ -1,27 +1,26 @@
+import io.atomix.catalyst.buffer.BufferInput;
+import io.atomix.catalyst.buffer.BufferOutput;
+import io.atomix.catalyst.serializer.Serializer;
 import org.jetbrains.annotations.NotNull;
 import org.mapdb.DataInput2;
 import org.mapdb.DataOutput2;
-import org.mapdb.Serializer;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
-public class UserDirectedMessage extends AbstractDirectedMessage {
+public class UserMessage extends AbstractDirectedMessage {
+    public static final SerializerUserMessage SERIALIZER = new SerializerUserMessage();
 
     private String text;
     private LocalDateTime dateTime;
 
-    public UserDirectedMessage(String senderUsername, String text, LocalDateTime dateTime) {
+    public UserMessage(String senderUsername, String text, LocalDateTime dateTime) {
         this(senderUsername, new ArrayList<>(), text, dateTime);
     }
 
-    public UserDirectedMessage(String senderUsername, List<String> destinationUsernames, String text, LocalDateTime dateTime) {
+    public UserMessage(String senderUsername, List<String> destinationUsernames, String text, LocalDateTime dateTime) {
         super(senderUsername, destinationUsernames);
         this.text = text;
         this.dateTime = dateTime;
@@ -36,32 +35,38 @@ public class UserDirectedMessage extends AbstractDirectedMessage {
     }
 
     @Override
-    public void writeObject()
+    public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
+        super.writeObject(bufferOutput, serializer);
 
-    public static class UserMessageSerializer implements Serializer<UserDirectedMessage> {
-        private UserMessageSerializer() {}
+        bufferOutput.writeString(text);
+        bufferOutput.writeLong(LocalDateTimeConverter.convertToTimestamp(dateTime));
+    }
+
+    @Override
+    public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
+        super.readObject(bufferInput, serializer);
+
+        this.text = bufferInput.readString();
+        this.dateTime = LocalDateTimeConverter.convertFromTimestamp(bufferInput.readLong());
+    }
+
+    public static class SerializerUserMessage implements org.mapdb.Serializer<UserMessage> {
+        private SerializerUserMessage() {}
 
         @Override
-        public void serialize(@NotNull DataOutput2 dataOutput2, @NotNull UserDirectedMessage userMessage) throws IOException {
+        public void serialize(@NotNull DataOutput2 dataOutput2, @NotNull UserMessage userMessage) throws IOException {
+            dataOutput2.writeUTF(userMessage.getSourceUsername());
             dataOutput2.writeUTF(userMessage.text);
-
-            Instant instant = userMessage.dateTime.atZone(ZoneId.systemDefault()).toInstant();
-            Date date = Date.from(instant);
-            dataOutput2.writeLong(date.getTime());
+            dataOutput2.writeLong(LocalDateTimeConverter.convertToTimestamp(userMessage.dateTime));
         }
 
         @Override
-        public UserDirectedMessage deserialize(@NotNull DataInput2 dataInput2, int nBytes) throws IOException {
-            if (nBytes <= 0)
-                return null;
-
+        public UserMessage deserialize(@NotNull DataInput2 dataInput2, int nBytes) throws IOException {
             String senderUsername = dataInput2.readUTF();
             String text = dataInput2.readUTF();
-            LocalDateTime dateTime = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(dataInput2.readLong()), TimeZone.getDefault().toZoneId()
-            );
+            LocalDateTime dateTime = LocalDateTimeConverter.convertFromTimestamp(dataInput2.readLong());
 
-            return new UserDirectedMessage(senderUsername, text, dateTime);
+            return new UserMessage(senderUsername, text, dateTime);
         }
     }
 }
