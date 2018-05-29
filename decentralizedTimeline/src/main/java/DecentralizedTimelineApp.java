@@ -1,8 +1,13 @@
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 public class DecentralizedTimelineApp implements Runnable {
     
@@ -19,12 +24,18 @@ public class DecentralizedTimelineApp implements Runnable {
 
     private boolean exit;
     private final BufferedReader in;
+    private final DB db;
+    private final ConcurrentMap<String, User> users;
     private final Map<String, CheckedIOFunction<String[], Integer>> cmdMap; // see CheckedIOFunction.java
 
     // TODO: Add peer instance variable
     public DecentralizedTimelineApp() {
         exit = false;
         in = new BufferedReader(new InputStreamReader(System.in));
+        db = DBMaker.fileDB("decentralized-timeline.db").fileMmapEnable().make();
+        users = db.hashMap("userMap", Serializer.STRING, User.SERIALIZER).createOrOpen();
+
+        // Command map initialization
         cmdMap = new HashMap<>();
         cmdMap.put("register", this::register);
         cmdMap.put("login", this::login);
@@ -42,7 +53,6 @@ public class DecentralizedTimelineApp implements Runnable {
 
     @Override
     public void run() {
-        // TODO: Check for configuration files
         try {
             while (exit == false) {
                 System.out.print(PROMPT); // TODO: Add username to prompt
@@ -60,6 +70,7 @@ public class DecentralizedTimelineApp implements Runnable {
         } catch (IOException ex) {
             System.out.println("Exiting because of error '" + ex.getMessage() + "'");
         }
+        db.close();
     }
 
     // Commands
@@ -125,7 +136,7 @@ public class DecentralizedTimelineApp implements Runnable {
 
     public Integer getMessages(String[] argv) throws IOException {
         try {
-            String username = null; // avoid "variable might not have been initialized"
+            String username;
             int nMessages = Integer.MAX_VALUE; // all messages
 
             if (argv.length == 2) {
