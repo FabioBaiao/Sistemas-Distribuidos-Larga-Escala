@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class UserMessage extends AbstractDirectedMessage, implements Comparable<UserMessage> {
+public class UserMessage extends AbstractDirectedMessage implements Comparable<UserMessage> {
     public static final SerializerUserMessage SERIALIZER = new SerializerUserMessage();
 
     private String text;
