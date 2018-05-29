@@ -9,8 +9,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class UserMessage extends AbstractDirectedMessage {
+public class UserMessage extends AbstractDirectedMessage, implements Comparable<UserMessage> {
     public static final SerializerUserMessage SERIALIZER = new SerializerUserMessage();
 
     private String text;
@@ -32,6 +33,31 @@ public class UserMessage extends AbstractDirectedMessage {
 
     public LocalDateTime getDateTime() {
         return dateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+
+        if (!(o instanceof UserMessage))
+            return false;
+
+        UserMessage that = (UserMessage) o;
+
+        return Objects.equals(text, that.text) && Objects.equals(dateTime, that.dateTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(text, dateTime);
+    }
+
+    @Override
+    public int compareTo(UserMessage other) {
+        int dateComparison = this.dateTime.compareTo(other.dateTime);
+
+        return (dateComparison != 0) ? dateComparison : this.text.compareTo(other.text);
     }
 
     @Override
