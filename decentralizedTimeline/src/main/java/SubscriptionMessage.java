@@ -2,12 +2,14 @@ import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.Serializer;
 
-public class SubscriptionDirectedMessage extends AbstractDirectedMessage {
-    public SubscriptionDirectedMessage() {
+import java.util.Collections;
+
+public class SubscriptionMessage extends AbstractDirectedMessage {
+    public SubscriptionMessage() {
     }
 
-    public SubscriptionDirectedMessage(String senderUsername, String destinationUsername) {
-        super(senderUsername, destinationUsername);
+    public SubscriptionMessage(String senderUsername, String destinationUsername) {
+        super(senderUsername, Collections.singletonList(destinationUsername));
     }
 
     @Override
