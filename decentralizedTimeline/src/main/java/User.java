@@ -1,13 +1,15 @@
+import messages.UserMessage;
 import org.jetbrains.annotations.NotNull;
 import org.mapdb.DataInput2;
 import org.mapdb.DataOutput2;
 import org.mapdb.Serializer;
 
-import messages.UserMessage;
-
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class User implements Serializable {
     public static final User.SerializerUser SERIALIZER = new SerializerUser();
