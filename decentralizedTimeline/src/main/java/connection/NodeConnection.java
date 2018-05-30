@@ -7,6 +7,9 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Connection;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
+import messages.ConnectRep;
+import messages.ConnectReq;
+import routing.BestConnection;
 
 import java.util.*;
 
@@ -32,7 +35,7 @@ public class NodeConnection {
 
         c.send(new ConnectReq(myAddress));
 
-        accept(myAddress);
+        //accept(myAddress);
     }
 
     private static void accept(Address myAddress) {
@@ -53,7 +56,7 @@ public class NodeConnection {
                     }
 
                     // associar username a conexao
-                    routing.put(rep.username, new BestConnection(c, 1));
+                    routing.put(rep.getSourceUsername(), new BestConnection(c, 1));
                 }
                 else {
                     c.close();

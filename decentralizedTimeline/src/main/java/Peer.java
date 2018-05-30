@@ -45,8 +45,8 @@ public class Peer {
     /*
     public void bootstrap(Address addr) throws Exception {
         Connection c = tc.execute(() -> this.transport.client().connect(addr)).join().get();
-        RegisterRep regRep = (RegisterRep) this.tc.execute(() ->
-                c.sendAndReceive(new RegisterReq())
+        messages.RegisterRep regRep = (messages.RegisterRep) this.tc.execute(() ->
+                c.sendAndReceive(new messages.RegisterReq())
         ).join().get();
 
         connectToNeigbors(regRep.getLivePeers());
