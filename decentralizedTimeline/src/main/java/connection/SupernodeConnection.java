@@ -7,6 +7,7 @@ import io.atomix.catalyst.transport.Address;
 import io.atomix.catalyst.transport.Connection;
 import io.atomix.catalyst.transport.Transport;
 import io.atomix.catalyst.transport.netty.NettyTransport;
+import messages.ConnectReq;
 import pt.haslab.ekit.Clique;
 
 import java.util.*;
@@ -15,8 +16,6 @@ public class SupernodeConnection {
 
     private static final List<Connection> connections = new ArrayList<>();
     private static final int MAX_CONN = 20;
-    //private static final Map<String, connection.BestConnection> routing = new HashMap<>();
-    //private static final Map<String, connection.BestSupernode> supernodeRouting = new HashMap<>();
 
     private static final ThreadContext tc = new SingleThreadContext("node-%d", new Serializer());
     private static final Transport t = new NettyTransport();
@@ -35,6 +34,10 @@ public class SupernodeConnection {
                 if (connections.size() < MAX_CONN) {
                     connections.add(c);
                 }
+                // recebeu req de um vizinho
+                else if (connections.contains(c)) {
+                    clique.send(myId, req);
+                }
                 else {
                     c.close();
                 }
@@ -43,6 +46,8 @@ public class SupernodeConnection {
                 for (int i = 0; i < supernodes; i++) {
                     clique.send(i, req);
                 }
+
+
             });
 
             c.onClose((closedConn) -> {
@@ -61,4 +66,6 @@ public class SupernodeConnection {
             connections.get(randomIndex).send(req);
         });
     }
+
+
 }
