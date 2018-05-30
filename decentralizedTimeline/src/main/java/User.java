@@ -3,10 +3,13 @@ import org.mapdb.DataInput2;
 import org.mapdb.DataOutput2;
 import org.mapdb.Serializer;
 
+import messages.UserMessage;
+
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
-public class User {
+public class User implements Serializable {
     public static final User.SerializerUser SERIALIZER = new SerializerUser();
 
     private final String username;

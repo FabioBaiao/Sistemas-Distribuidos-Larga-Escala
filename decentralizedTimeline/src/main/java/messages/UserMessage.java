@@ -9,12 +9,13 @@ import org.mapdb.DataInput2;
 import org.mapdb.DataOutput2;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class UserMessage extends AbstractDirectedMessage implements Comparable<UserMessage> {
+public class UserMessage extends AbstractDirectedMessage implements Comparable<UserMessage>, Serializable {
     public static final SerializerUserMessage SERIALIZER = new SerializerUserMessage();
 
     private String text;

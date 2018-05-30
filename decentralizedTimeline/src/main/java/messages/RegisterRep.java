@@ -4,46 +4,59 @@ import io.atomix.catalyst.buffer.BufferInput;
 import io.atomix.catalyst.buffer.BufferOutput;
 import io.atomix.catalyst.serializer.Serializer;
 import io.atomix.catalyst.transport.Address;
-import messages.AbstractMessage;
+import sun.jvm.hotspot.asm.Register;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class RegisterRep extends AbstractMessage {
-    private List<Address> livePeers;
+    private RegisterRep.Status status;
 
     public RegisterRep() {}
 
-    public RegisterRep(List<Address> livePeers) {
+    public RegisterRep(RegisterRep.Status status) {
         super();
-        this.livePeers = Collections.unmodifiableList(new ArrayList<>(livePeers));
+        this.status = status;
     }
 
-    public List<Address> getLivePeers() {
-        return livePeers;
-    }
+    public RegisterRep.Status getStatus() { return status; }
 
     @Override
     public void writeObject(BufferOutput<?> bufferOutput, Serializer serializer) {
         super.writeObject(bufferOutput, serializer);
 
-        bufferOutput.writeInt(livePeers.size());
-        for(Address a: livePeers){
-            bufferOutput.writeString(a.host());
-            bufferOutput.writeInt(a.port());
-        }
+        bufferOutput.writeInt(status.getValue());
     }
 
     @Override
     public void readObject(BufferInput<?> bufferInput, Serializer serializer) {
         super.readObject(bufferInput, serializer);
 
-        final int size = bufferInput.readInt();
-        this.livePeers = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            this.livePeers.add(new Address(bufferInput.readString(), bufferInput.readInt()));
+        this.status = Status.fromInteger(bufferInput.readInt());
+    }
+
+    public enum Status {
+        SUCCESS(0), USERNAME_IN_USE(1);
+
+        private final int value;
+
+        Status(int value) {
+            this.value = value;
         }
-        this.livePeers = Collections.unmodifiableList(this.livePeers);
+
+        public int getValue() {
+            return value;
+        }
+
+        public static Status fromInteger(int i) {
+            switch (i) {
+                case 0:
+                    return SUCCESS;
+                case 1:
+                    return USERNAME_IN_USE;
+            }
+            return null;
+        }
     }
 }

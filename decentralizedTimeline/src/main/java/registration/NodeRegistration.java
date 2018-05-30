@@ -1,7 +1,9 @@
-package Register;
+package registration;
 
 import connection.BestConnection;
 import io.atomix.catalyst.transport.Connection;
+import messages.RegisterRep;
+import messages.RegisterReq;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +23,9 @@ public class NodeRegistration {
     }
 
 
-    public void register(CompletableFuture<RegisterRep.Reply> reply, Connection connection) {
+    public void register(CompletableFuture<RegisterRep.Status> reply, Connection connection) {
         connection.handler(RegisterRep.class, rep -> {
-            reply.complete(rep.getReply());
+            reply.complete(rep.getStatus());
         });
 
         connection.send(new RegisterReq(username));
@@ -33,19 +35,20 @@ public class NodeRegistration {
         connection.handler(RegisterReq.class, req -> {
             String username = req.getRequestedUsername();
             int hops = req.getNumHops();
-            RegisterRep.Reply reply = null;
+            RegisterRep.Status replyStatus = null;
 
-            if (routing.containsKey(username))
-                reply = RegisterRep.Reply.USERNAME_IN_USE;
-            else{
-                reply = RegisterRep.Reply.SUCCESSFUL;
-                RegisterReq request = new RegisterReq(username);
-                request.setNumHops(hops+1);
-                for(Connection c: neighborConnections)
-                    c.send(request);
+            if (routing.containsKey(username)) {
+                replyStatus = RegisterRep.Status.USERNAME_IN_USE;
+            } else {
+                replyStatus = RegisterRep.Status.SUCCESS;
+                req.incrementNumHops();
+
+                for(Connection c : neighborConnections)
+                    c.send(req);
             }
+            // N
             if(hops == 1) {
-                RegisterRep rep = new RegisterRep(reply);
+                RegisterRep rep = new RegisterRep(replyStatus);
                 connection.send(rep);
             }
         });
