@@ -10,7 +10,9 @@ import io.atomix.catalyst.transport.netty.NettyTransport;
 import messages.ConnectReq;
 import pt.haslab.ekit.Clique;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class SupernodeConnection {
 

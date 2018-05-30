@@ -18,41 +18,44 @@ public class NodeRegistration {
 
     public NodeRegistration(String username){
         this.username = username;
-        neighborConnections = new ArrayList<>();
-        routing = new HashMap<>();
+        this.neighborConnections = new ArrayList<>();
+        this.routing = new HashMap<>();
     }
 
+    /** Must be called inside a SingleThreadContext */
+    public CompletableFuture<RegisterRep.Status> register(Connection connection) {
+        CompletableFuture<RegisterRep.Status> futureReplyStatus = new CompletableFuture<>();
 
-    public void register(CompletableFuture<RegisterRep.Status> reply, Connection connection) {
         connection.handler(RegisterRep.class, rep -> {
-            reply.complete(rep.getStatus());
+            futureReplyStatus.complete(rep.getStatus());
         });
 
         connection.send(new RegisterReq(username));
+        return futureReplyStatus;
     }
 
-    public void registerRequestHandler(Connection connection){
+    /** Must be called inside a SingleThreadContext */
+    public void registerRequestHandler(Connection connection) {
         connection.handler(RegisterReq.class, req -> {
             String username = req.getRequestedUsername();
-            int hops = req.getNumHops();
+            int numHops = req.getNumHops();
             RegisterRep.Status replyStatus = null;
 
             if (routing.containsKey(username)) {
                 replyStatus = RegisterRep.Status.USERNAME_IN_USE;
-            } else {
+            } else { // broadcast to neighbors
                 replyStatus = RegisterRep.Status.SUCCESS;
                 req.incrementNumHops();
 
-                for(Connection c : neighborConnections)
+                for(Connection c : neighborConnections) {
                     c.send(req);
+                }
             }
-            // N
-            if(hops == 1) {
+
+            if (numHops == 1) {
                 RegisterRep rep = new RegisterRep(replyStatus);
                 connection.send(rep);
             }
         });
     }
-
-
 }
